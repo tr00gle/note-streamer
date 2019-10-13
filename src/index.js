@@ -1,33 +1,23 @@
-#!/usr/bin/env node
-
-const { Transform } = require('stream');
 const fs = require('fs');
 const path = require('path');
+const { Transform } = require('stream');
 
-const { dateStamp } = require('../utils/dates');
+require('dotenv').config();
 
+const { dateStamp } = require('./utils/dates');
+
+let notesPath = process.env.DEFAULT_PATH;
+let domain = process.env.DOMAIN
+let domainModifier;
+
+// TODO: configure path domain via command line args
 const args = process.argv.slice(2);
-
-
-const DEFAULT_NOTES_PATH = path.join('/', 'Users', 'rtrontz', 'Dropbox', 'codesmith', 'csPrep', 'notes');
-let notesPath = DEFAULT_NOTES_PATH;
-// TODO: insert logic for adjusting default path via command-line args
-let cohortNumber;
-
-if (/cohort/.test(args[0])) {
-  cohortNumber = args[0].split('=')[1];
+if (/^--mod=/.test(args[0])) {
+  domainModifier = args[0].split('=')[1];
 }
 
-const notesTitle = `# ${dateStamp()} cs-prep ${cohortNumber} notes  \n\n`
-const filename = `${dateStamp()}-cs-prep-${cohortNumber ? `${cohortNumber}-` : ``}notes.md`
-/**
- * The goal here is to run a node program that does the following:
- * 1. takes single-line notes from standard input 
- * 2. Transforms those notes into bulleted list items (markdown)
- * 3. Writes them to a file as we go. 
- * 4. Takes a command to close/end the stream 
- * 5. The notes file's title should be of the form cs-prep <cohortNumber> <date>  notes
- */
+const notesTitle = `# ${dateStamp()} ${domain}${domainModifier ? ` ${domainModifier}`: ``} notes  \n\n`
+const filename = `${dateStamp()}-${domain}-${domainModifier ? `${domainModifier}-` : ``}notes.md`
 
 // Initialize the transform stream to convert input to markdown syntax
 const markdownTransform = new Transform({
@@ -53,17 +43,19 @@ const markdownTransform = new Transform({
 })
 
 // Initialize the writable stream to markdown file.
-const notesFile = fs.createWriteStream(path.join(notesPath, filename));
+const fullFilename = path.join(notesPath, filename)
+const notesFile = fs.createWriteStream(fullFilename);
 
 // Add title line to the notes file
 notesFile.write(notesTitle);
-
+console.log(`Starting new session in ${fullFilename}\n\n`);
 process.stdin.pipe(markdownTransform)
-             .on('separator', () => console.log(' * * * * writing separator * * * * \n'))
+             .on('separator', () => console.log(' * * * * new section * * * * \n'))
              .on('note', () => console.log('* * * * note added * * * * \n'))
-             .on('header', () => console.log('* * * * adding header * * * * \n'))
+             .on('header', () => console.log('* * * * header added * * * * \n'))
              .on('close', () => {
-              console.log('* * * * ending * * * * ')
+              console.log('* * * * session ended * * * * ')
+              console.log(`Follow this path to your notes: ${fullFilename}`)
               notesFile.end();
               process.exit();
             })
