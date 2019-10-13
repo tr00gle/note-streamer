@@ -6,6 +6,21 @@ This is package designed to take lines of text input via the terminal, transform
 
 ## Use
 
+Before your first use: 
+* make a `.env` file in the root directory 
+* set the following environment variables: `DEFAULT_PATH`, `DOMAIN`, and `DOMAIN_MODIFIER`
+
+run the program with `node <path to this directory>/src/index.js`
+
+### Commands  
+
+* add notes by entering a string through your terminal and pressing `return`
+* add horizontal separator to your notes with `sep`
+* add a header with `h[heading level] [some header]` 
+  * e.g. `h2 this will be a heading`
+* end the session with `q`
+* go get your notes using the file path provided to you
+
 
 ## What should we be able to do? 
 
