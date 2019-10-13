@@ -8,7 +8,7 @@ const { dateStamp } = require('./utils/dates');
 
 let notesPath = process.env.DEFAULT_PATH;
 let domain = process.env.DOMAIN
-let domainModifier;
+let domainModifier = process.env.DOMAIN_MODIFIER;
 
 // TODO: configure path domain via command line args
 const args = process.argv.slice(2);
