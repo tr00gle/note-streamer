@@ -11,4 +11,4 @@ function dateStamp() {
   return `${year}-${month}-${day}`
 }
 
-exports.dateStamp = dateStamp;
+module.exports = { dateStamp };

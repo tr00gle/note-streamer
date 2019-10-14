@@ -5,6 +5,7 @@ const { Transform } = require('stream');
 require('dotenv').config();
 
 const { dateStamp } = require('./utils/dates');
+const { md, txt } = require('./utils/text');
 
 let notesPath = process.env.DEFAULT_PATH;
 let domain = process.env.DOMAIN
@@ -16,27 +17,27 @@ if (/^--mod=/.test(args[0])) {
   domainModifier = args[0].split('=')[1];
 }
 
-const notesTitle = `# ${dateStamp()} ${domain}${domainModifier ? ` ${domainModifier}`: ``} notes  \n\n`
-const filename = `${dateStamp()}-${domain}-${domainModifier ? `${domainModifier}-` : ``}notes.md`
-
+const notesTitle = md.makeTitleText(dateStamp())(domain)(domainModifier)
+const filename = txt.makeFilename(dateStamp())('notes')('md')(domain, domainModifier)
 // Initialize the transform stream to convert input to markdown syntax
 const markdownTransform = new Transform({
   transform(chunk, encoding = 'utf-8', callback) {
     const str = chunk.toString().trim();
-    const header = /^h\d/
+    const headerRegEx = /^h\d/
     if (str === 'q') {
       this.emit('close');
     } else if (str === 'sep') {
       this.emit('separator');
-      this.push(`\n---  \n\n`);
-    } else if (header.test(str)) {
-      const level = str.match(header)[0];
-      const headerString = str.slice(3);
+      this.push(md.makeSeparator());
+    } else if (headerRegEx.test(str)) {
+      const level = str.match(headerRegEx)[0][1];
+      const headerText = str.slice(3);
+      const header = md.makeHeader(level, headerText);
       this.emit('header');
-      this.push(`\n${"#".repeat(level[1])} ${headerString}  \n\n`);
+      this.push(md.addNewLinesToHeader(2, header));
     } else {
       this.emit('note');
-      this.push(`* ${str}  \n`)
+      this.push(md.makeULItem(str))
     }
     callback();
   },

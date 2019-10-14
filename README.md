@@ -6,7 +6,7 @@ This is package designed to take lines of text input via the terminal, transform
 
 ## Use
 
-
+  
 
 ### Environtment Variables
 Before your first use: 
