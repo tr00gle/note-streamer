@@ -34,7 +34,7 @@ const markdownTransform = new Transform({
       const headerText = str.slice(3);
       const header = md.makeHeader(level, headerText);
       this.emit('header');
-      this.push(md.addNewLinesToHeader(2, header));
+      this.push(md.addTwoLinesToHeader(header));
     } else {
       this.emit('note');
       this.push(md.makeULItem(str))

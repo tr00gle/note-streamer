@@ -1,10 +1,7 @@
-function makeHeader(level, headerText) {
-  return `${'#'.repeat(level)} ${headerText}`
-}
+const makeHeader = (level, headerText) => `${'#'.repeat(level)} ${headerText}`;
 
-function addNewLinesToHeader(newlineCount, header) {
-  return `${header}  ${'\n'.repeat(newlineCount)}`
-}
+const  addNewLinesToHeader = (newlineCount) => (header) => `${header}  ${'\n'.repeat(newlineCount)}`
+const addTwoLinesToHeader = addNewLinesToHeader(2);
 
 const makeTitleText = date => domain => (...modifiers) => 
   `# ${date} ${domain}${modifiers.length ? ` ${modifiers.join(' ')} ` :` `} notes\n\n`
@@ -16,12 +13,10 @@ const makeULItem = text => `- ${text}\n`
 const makeFilename = date => suffix => extension => 
   (...words) => `${date}-${words.length ? `${words.join('-')}-` : ``}${suffix}.${extension}`
 
-
-
 module.exports = { 
   md: {
     makeHeader, 
-    addNewLinesToHeader,
+    addTwoLinesToHeader,
     makeTitleText,
     makeSeparator,
     makeULItem
